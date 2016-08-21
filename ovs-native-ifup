@@ -1,0 +1,4 @@
+# May need to manually add tap device:
+ip tuntap add mode tap $1
+# ifconfig $1 up 
+# /usr/bin/ovs-vsctl add-port br1 $1
