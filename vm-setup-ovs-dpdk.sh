@@ -6,7 +6,7 @@
 
 VM_NAME=ovs-dpdk-xenial0
 GUEST_MEM=1024M
-VM_IMAGE=/home/silvery/vm-img/ovs-nativ-xenial0.qcow2
+VM_IMAGE=/home/silvery/vm-img/ovs-native-xenial0.qcow2
 CD_ROM=/home/silvery/vm-img/ubuntu-16.04.1-desktop-amd64.iso
 VHOST_SOCK_DIR=/usr/local/var/run/openvswitch
 

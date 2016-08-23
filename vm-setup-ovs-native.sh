@@ -16,7 +16,7 @@ sudo qemu-system-x86_64 -m $GUEST_MEM -name $VM_NAME -cpu host \
 -hda $VM_IMAGE \
 -enable-kvm -no-reboot \
 -netdev tap,id=vnic1,vhost=on \
--device virtio-net-pci,netdev=vnic1,mac=00:00:00:00:00:04
+-device virtio-net-pci,netdev=vnic1,mac=00:00:00:00:00:01 $@
 
 # -net nic,macaddr=00:00:00:00:00:02 \
 # -net tap,vhost=on # Manually add the tap device to the ovs
