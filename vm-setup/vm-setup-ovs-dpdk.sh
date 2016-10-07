@@ -4,6 +4,10 @@
 # e.g., vm-setup-x-x.sh -
 # The default user name is dpdk-ovs0
 
+if [ "$#" -eq 0 ]; then
+echo "==> You may append more parameters for qemu."
+fi
+
 VM_NAME=ovs-dpdk-xenial0
 GUEST_MEM=1024M
 VM_IMAGE=/home/silvery/vm-img/ovs-native-xenial0.qcow2
