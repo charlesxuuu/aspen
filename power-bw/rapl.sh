@@ -1,10 +1,5 @@
 #!/bin/bash
 
-if [ "$#" -eq 0 ]; then 
-echo "==> Please specify the interface."
-exit
-fi
-
 IFACE=$1
 
 # Obtain the measurements
