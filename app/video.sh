@@ -4,5 +4,9 @@
 URL=$1
 COUNT=$2
 
-
-ffplay $1 -nodisp &
+for (( i=1; i<=$COUNT; i++ ))
+do
+#ffplay $1 -nodisp &
+sleep 10
+echo one
+done
