@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$#" -eq 0 ]; then
+if [ "$#" -le 0 ]; then
 echo "==> Please specify the video file."
 exit
 fi
