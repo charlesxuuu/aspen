@@ -10,7 +10,7 @@ IFACE=$1
 # Obtain the measurements
 DATE=$(date +"%H:%M:%S")
 LINE_START=($(cat /proc/net/dev | grep $1))
-POWER=$(./rapl-read-quiet)
+sleep 1
 LINE_END=($(cat /proc/net/dev | grep $1))
 
 # Start the calculation
@@ -30,4 +30,4 @@ SEND_PKT_START=${LINE_START[10]}
 SEND_PKT_END=${LINE_END[10]}
 SEND_PKT_RATE=$(($SEND_PKT_END - $SEND_PKT_START))
 
-echo $DATE $POWER
+echo $DATE $RECV_BW $SEND_BW $RECV_PKT_RATE $SEND_PKT_RATE
