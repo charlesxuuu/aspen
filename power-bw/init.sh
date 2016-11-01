@@ -1,3 +1,3 @@
 #!/bin/bash
 
-modprobe msr
+sudo apt-get install msr-tools
