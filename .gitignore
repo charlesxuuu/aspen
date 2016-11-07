@@ -2,3 +2,4 @@ log/
 blackhole/
 *.o
 aspen-agent
+.vs/
