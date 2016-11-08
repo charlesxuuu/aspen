@@ -11,7 +11,7 @@ program_LIBRARIES :=
 CPPFLAGS += $(foreach includedir,$(program_INCLUDE_DIRS),-I$(includedir))
 LDFLAGS += $(foreach librarydir,$(program_LIBRARY_DIRS),-L$(librarydir))
 LDFLAGS += $(foreach library,$(program_LIBRARIES),-l$(library))
-CPPFLAGS += -w -O2
+CPPFLAGS += -w -O2 -std=c++11 #-DDEBUG
 
 .PHONY: all clean distclean
 all: $(program_NAME)

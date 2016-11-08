@@ -3,29 +3,47 @@
 using namespace std;
 using namespace aspen::agent;
 
-void exitHandler(int signum) {
-	system(("pkill " + kRaplSrc + "; pkill " + kBwSrc).c_str());
+Collector* collector;
+
+void ExitHandler(int signum) {
+	cerr << " Captured Interrupt Signal\n";
+	if (collector) {
+		collector->StopCollection();
+		delete collector;
+		collector = nullptr;
+	}
 	exit(signum);
 };
 
-void startReaders() {
-	string bw_reader = kRteDir + kNetDir + kBwSrc;
-	string rapl_reader = kRteDir + kPowerDir + kRaplSrc;
-
-	system((bw_reader + " -t " + kSampleIntvlStr + " -i " + kNicName + " &").c_str());
-	system(("cd " + kRteDir + kPowerDir + ";" + rapl_reader + " -t " + kSampleIntvlStr + " &").c_str());
-	cout << "==Aspen Agent==> Executed readers." <<endl;
-};
-
 int main(int argc, char **argv) {
-	signal(SIGINT, exitHandler);
+	signal(SIGINT, ExitHandler);
 
-	startReaders();
-	usleep(kSampleIntvl*2);
+	try {
+		collector = new Collector(0);
+	} catch (const bad_alloc& e) {
+		cerr << "== Aspen Agent ==> Reached memory limitation" << endl;
+		ExitHandler(SIGQUIT);
+	}
 
-	Collector* col = new Collector();
-	col->Collect(kBwPipe, kRaplPipe, kSampleIntvl);
-	delete col;
+	collector->SetInterval(kSampleIntvlInt);
+  collector->SetOutputPath(kOutputTarget, kOutputDirectory);
+
+	collector->AddTarget(kBwSrc,
+											 kParentDirectory + kNetDir,
+											 " -t " + kSampleIntvlStr + " -i " + kInterfaceName);
+	collector->BindPipe(kBwSrc, kBwPipe);
+	collector->AddTarget(kRaplSrc,
+											 kParentDirectory + kPowerDir,
+											 " -t " + kSampleIntvlStr);
+	collector->BindPipe(kRaplSrc, kRaplPipe);
+	collector->SetEnvironment(kRaplSrc, kParentDirectory + kPowerDir);
+
+	collector->CollectInformation();
+
+	if (collector) {
+		delete collector;
+		collector = nullptr;
+	}
 
 	return 0;
 }
