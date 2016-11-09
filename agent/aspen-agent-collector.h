@@ -34,35 +34,32 @@
 namespace aspen {
 namespace agent {
 
+#define EXEC 0
+#define PIPE 1
+#define ENVI 2
+#define DIR_FILE 0x1
+#define REG_FILE 0x2
+#define XSR_FILE 0x4
+
 class Collector {
 private:
-	bool exit_signal_;
-	timespec interval_;
-	std::string output_path_;
-	std::ifstream istream_;
-	std::ofstream ostream_;
-	std::map<std::string, std::string> target_list_;
-	std::map<std::string, std::string> pipe_list_;
-	std::map<std::string, std::string> environment_list_;
+  bool exit_signal_;
+  timespec interval_;
+  std::string output_path_;
+  std::ifstream istream_;
+  std::ofstream ostream_;
+  std::map<std::string, std::map<int, std::string>> target_list_;
+  int IsValidFile(const std::string &file, const int &mode);
 public:
-	explicit Collector(const int &interval) {
-		exit_signal_ = false;
-		output_path_ = "";
-		target_list_.clear();
-		pipe_list_.clear();
-		SetInterval(interval);
-	};
-	~Collector();
-	void SetInterval(const int &interval);
-	void SetOutputPath(const std::string &target, const std::string &path);
-	void AddTarget(const std::string &target, const std::string &path,
-								 const std::string &arguments);
-	void BindPipe(const std::string &target, const std::string &pipe);
-	void SetEnvironment(const std::string &target, const std::string &environment);
-	void ListTarget();
-	void CollectInformation();
-	void StopCollection();
-//	void Collect(std::string, std::string, int);
+  explicit Collector(const int &interval, const std::string &path, 
+      const std::string &outlet);
+  ~Collector();
+  void AddTarget(const std::string &target, const std::string &pipe, 
+      const std::string &path, const std::string &arguments, 
+      const std::string &environment);
+  void CollectInformation();
+  void StopCollection();
+  void DebugInfo(const std::string &action, const std::string &target, const int &ret);
 };
 
 } // namespace agent
