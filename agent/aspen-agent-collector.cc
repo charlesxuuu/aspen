@@ -33,12 +33,12 @@ Collector::Collector(const int &interval, const std::string &path="",
 }
 
 Collector::~Collector() {
-	for (auto iter : target_list_) {
-	  string proc_name = iter.first;
-	  if (proc_name.size() > 15) proc_name = proc_name.substr(0, 15);
-	  int ret = system(("pkill " + proc_name).c_str());
+  for (auto iter : target_list_) {
+    string proc_name = iter.first;
+    if (proc_name.size() > 15) proc_name = proc_name.substr(0, 15);
+    int ret = system(("pkill " + proc_name).c_str());
     DebugInfo("Killed target", proc_name, ret);
-	}
+  }
   istream_.close();
   ostream_.close();
 }
@@ -82,10 +82,10 @@ void Collector::AddTarget(const std::string &target, const std::string &pipe,
 }
 
 void Collector::CollectInformation() {
-	if (0 == interval_.tv_sec && 0 == interval_.tv_nsec) {
+  if (0 == interval_.tv_sec && 0 == interval_.tv_nsec) {
     DebugInfo("Collector has interval", "0", -1);
 	  return ;
-	}
+  }
 
   for (auto iter : target_list_) {
     string environment = iter.second.find(ENVI)->second;
@@ -97,37 +97,36 @@ void Collector::CollectInformation() {
     int ret = system((execution + " &").c_str());
     DebugInfo("Background task", iter.first, ret);
   }
+  timespec initial_time = interval_;
+  initial_time.tv_sec = interval_.tv_sec * target_list_.size();
+  nanosleep(&initial_time, NULL);
 
-	timespec initial_time = interval_;
-	initial_time.tv_sec = interval_.tv_sec * target_list_.size();
-	nanosleep(&initial_time, NULL);
-
-	string raw_data;
+  string raw_data;
   ostream_.open(output_path_, ios::out | ios::app);
-	while(!exit_signal_) {
-	  for(auto iter : target_list_) {
+  while(!exit_signal_) {
+    for(auto iter : target_list_) {
       const string pipe_file(iter.second.find(PIPE)->second);
-	    istream_.open(pipe_file.c_str(), ios::in);
-	    if (istream_.good() && getline(istream_, raw_data)) {
-	      if("" == output_path_)
-	        cout << raw_data << endl;
-	      else {
-	        if(ostream_.good()) ostream_ << raw_data << endl;
+      istream_.open(pipe_file.c_str(), ios::in);
+      if (istream_.good() && getline(istream_, raw_data)) {
+        if("" == output_path_)
+          cout << raw_data << endl;
+        else {
+          if(ostream_.good()) ostream_ << raw_data << endl;
           else DebugInfo("Output failed", "", -1);
-	      }
-	      istream_.close();
-	    } else break;
-	  }
-	  nanosleep(&interval_, NULL);
-	}
+        }
+        istream_.close();
+      } else break;
+    }
+    nanosleep(&interval_, NULL);
+  }
   DebugInfo("Failure on reading pipes", "", -1);
-	istream_.close();
-	ostream_.close();
-	return ;
+  istream_.close();
+  ostream_.close();
+  return ;
 }
 
 void Collector::StopCollection() {
-	exit_signal_ = true;
+  exit_signal_ = true;
 }
 
 void Collector::DebugInfo(const std::string &action, const std::string &target, 
