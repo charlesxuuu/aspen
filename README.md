@@ -1,20 +1,28 @@
-OvS-DPDK Testbed
+Aspen
 ================
-
 Overview
 --------
 
-Steps to setup:
+* /agent: power agent code
+* /app: scripts for deploying middleboxes 
+* /config: scripts for testbed config
+* /fwd-setup: forwarding plane setup code
+* /net-mon: network performance monitoring code
+* /power-mon: power monitoring and tuning code
+* /vm-setup: scripts for VM setup
 
-* A host<->ovs-dpdk<->kvm testbed
-* A host<->ovs-native<->kvm testbed
-* A host<->linux-native<->kvm testbed
+Finally, **A**spen'**S** **P**ower **E**fficient **N**FV
 
-Prerequisites 
--------------
+Testbed Setup
+--------
+Prerequisites:
 
-* OvS (Open vSwitch) built and installed
-* OvS-DPDK built and installed
+* OvS (Open vSwitch) built and configured 
+* OvS-DPDK built and configured
+
+* host<->ovs-dpdk<->kvm 
+* host<->ovs-native<->kvm 
+* host<->linux-native<->kvm
 
 Details
 -------
