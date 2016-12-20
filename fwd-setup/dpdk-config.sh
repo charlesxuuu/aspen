@@ -2,8 +2,12 @@
 #Inputs: huge_page_size
 
 SDK_DIR=/usr/src/dpdk-16.07
-NIC_PCI_PATH_1=0000:01:00.0
-NIC_PCI_PATH_2=0000:01:00.1
+
+if [ "$#" == 0 ]; then
+NIC_PCI_PATH=0000:01:00.1
+else
+NIC_PCI_PATH=$@
+fi
 
 HUGEPGSZ=`cat /proc/meminfo  | grep Hugepagesize | cut -d : -f 2 | tr -d ' '`
 HUGEPGCOUNT=2048
@@ -107,10 +111,10 @@ bind_nics_to_vfio()
 		echo ""
 		echo -n "Enter PCI address of device to bind to VFIO driver: "
 		
-		sudo ${RTE_SDK}/tools/dpdk-devbind.py -b vfio-pci $NIC_PCI_PATH_1 &&
+		for nic in $NIC_PCI_PATH; do
+		sudo ${RTE_SDK}/tools/dpdk-devbind.py -b vfio-pci $nic &&
 			echo "OK"
-		sudo ${RTE_SDK}/tools/dpdk-devbind.py -b vfio-pci $NIC_PCI_PATH_2 &&
-			echo "OK"
+		done
 	else
 		echo "# Please load the 'vfio-pci' kernel module before querying or "
 		echo "# adjusting NIC device bindings"
