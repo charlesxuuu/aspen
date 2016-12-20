@@ -1,8 +1,8 @@
 #!/bin/bash
 # Fix the libnuma, libpcap, python six issue: 
-# sudo ln -s /usr/lib/x86_64-linux-gnu/libnuma.so.1 /usr/lib/x86_64-linux-gnu/libnuma.so
-# sudo ln -s /usr/lib/x86_64-linux-gnu/libpcap.so.0.8 /usr/lib/x86_64-linux-gnu/libpcap.so
-# pip install six
+sudo ln -s /usr/lib/x86_64-linux-gnu/libnuma.so.1 /usr/lib/x86_64-linux-gnu/libnuma.so
+sudo ln -s /usr/lib/x86_64-linux-gnu/libpcap.so.0.8 /usr/lib/x86_64-linux-gnu/libpcap.so
+pip install six
  
 cd /usr/src/
 git clone https://github.com/openvswitch/ovs.git
