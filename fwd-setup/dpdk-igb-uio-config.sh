@@ -109,9 +109,9 @@ bind_nics_to_igb_uio()
 	if [ -d /sys/module/igb_uio ]; then
 		${RTE_SDK}/tools/dpdk-devbind.py --status
 		echo ""
-		echo -n "Enter PCI address of device to bind to IGB UIO driver: "
-		read PCI_PATH
-		sudo ${RTE_SDK}/tools/dpdk-devbind.py -b igb_uio $PCI_PATH && echo "OK"
+		for nic in $NIC_PCI_PATH; do
+			sudo ${RTE_SDK}/tools/dpdk-devbind.py -b igb_uio $nic && echo "OK"
+		done
 	else
 		echo "# Please load the 'igb_uio' kernel module before querying or "
 		echo "# adjusting NIC device bindings"

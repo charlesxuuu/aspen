@@ -10,8 +10,8 @@ fi
 
 VM_NAME=ovs-dpdk-xenial0
 GUEST_MEM=1024M
-VM_IMAGE=/home/silvery/vm-img/ovs-native-xenial0.qcow2
-CD_ROM=/home/silvery/vm-img/ubuntu-16.04.1-desktop-amd64.iso
+VM_IMAGE=~/vm-img/ovs-native-xenial0.qcow2
+CD_ROM=~/vm-img/ubuntu-16.04.1-desktop-amd64.iso
 VHOST_SOCK_DIR=/usr/local/var/run/openvswitch
 
 sudo echo "=> Lauching VM..."
@@ -19,7 +19,7 @@ sudo echo "=> Lauching VM..."
 sudo qemu-system-x86_64 -m $GUEST_MEM -name $VM_NAME -cpu host \
 -hda $VM_IMAGE \
 -enable-kvm -no-reboot -net none \
--chardev socket,id=char1,path=$VHOST_SOCK_DIR/dpdkvhostuser0 \
+-chardev socket,id=char1,path=$VHOST_SOCK_DIR/dpdkvhostuser1 \
 -netdev type=vhost-user,id=mynet1,chardev=char1,vhostforce \
 -device virtio-net-pci,mac=00:00:00:00:00:01,netdev=mynet1 \
 -object memory-backend-file,id=mem,size=$GUEST_MEM,mem-path=/dev/hugepages,share=on \
