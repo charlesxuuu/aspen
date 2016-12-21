@@ -1,5 +1,6 @@
 #!/bin/bash
-#Inputs: huge_page_size
+
+#Inputs: NIC PCI addresses
 
 SDK_DIR=/usr/src/dpdk-16.07
 
@@ -14,34 +15,33 @@ HUGEPGCOUNT=2048
 
 export RTE_SDK=$SDK_DIR
 
-load_vfio_module()
+load_igb_uio_module()
 {
-	remove_vfio_module
+	if [ ! -f $RTE_SDK/$RTE_TARGET/kmod/igb_uio.ko ];then
+		echo "## ERROR: Target does not have the DPDK UIO Kernel Module."
+		echo "       To fix, please try to rebuild target."
+		return
+	fi
 
-	VFIO_PATH="kernel/drivers/vfio/pci/vfio-pci.ko"
+	remove_igb_uio_module
 
-	echo "Loading VFIO module"
-	/sbin/lsmod | grep -s vfio_pci > /dev/null
+	/sbin/lsmod | grep -s uio > /dev/null
 	if [ $? -ne 0 ] ; then
-		if [ -f /lib/modules/$(uname -r)/$VFIO_PATH ] ; then
-			sudo /sbin/modprobe vfio-pci
+		modinfo uio > /dev/null
+		if [ $? -eq 0 ]; then
+			echo "Loading uio module"
+			sudo /sbin/modprobe uio
 		fi
 	fi
 
-	# make sure regular users can read /dev/vfio
-	echo "chmod /dev/vfio"
-	sudo chmod a+x /dev/vfio
-	if [ $? -ne 0 ] ; then
-		echo "FAIL"
-		quit
-	fi
-	echo "OK"
+	# UIO may be compiled into kernel, so it may not be an error if it can't
+	# be loaded.
 
-	# check if /dev/vfio/vfio exists - that way we
-	# know we either loaded the module, or it was
-	# compiled into the kernel
-	if [ ! -e /dev/vfio/vfio ] ; then
-		echo "## ERROR: VFIO not found!"
+	echo "Loading DPDK UIO module"
+	sudo /sbin/insmod $RTE_SDK/$RTE_TARGET/kmod/igb_uio.ko
+	if [ $? -ne 0 ] ; then
+		echo "## ERROR: Could not load kmod/igb_uio.ko."
+		quit
 	fi
 }
 
@@ -104,73 +104,23 @@ remove_mnt_huge()
 	fi
 }
 
-bind_nics_to_vfio()
+bind_nics_to_igb_uio()
 {
-	if [ -d /sys/module/vfio_pci ]; then
+	if [ -d /sys/module/igb_uio ]; then
 		${RTE_SDK}/tools/dpdk-devbind.py --status
 		echo ""
-		echo -n "Enter PCI address of device to bind to VFIO driver: "
-		
-		for nic in $NIC_PCI_PATH; do
-		sudo ${RTE_SDK}/tools/dpdk-devbind.py -b vfio-pci $nic &&
-			echo "OK"
-		done
+		echo -n "Enter PCI address of device to bind to IGB UIO driver: "
+		read PCI_PATH
+		sudo ${RTE_SDK}/tools/dpdk-devbind.py -b igb_uio $PCI_PATH && echo "OK"
 	else
-		echo "# Please load the 'vfio-pci' kernel module before querying or "
+		echo "# Please load the 'igb_uio' kernel module before querying or "
 		echo "# adjusting NIC device bindings"
 	fi
 }
 
-set_vfio_permissions()
-{
-	# make sure regular users can read /dev/vfio
-	echo "chmod /dev/vfio"
-	sudo chmod a+x /dev/vfio
-	if [ $? -ne 0 ] ; then
-		echo "FAIL"
-		quit
-	fi
-	echo "OK"
-
-	# make sure regular user can access everything inside /dev/vfio
-	echo "chmod /dev/vfio/*"
-	sudo chmod 0666 /dev/vfio/*
-	if [ $? -ne 0 ] ; then
-		echo "FAIL"
-		quit
-	fi
-	echo "OK"
-
-	# since permissions are only to be set when running as
-	# regular user, we only check ulimit here
-	#
-	# warn if regular user is only allowed
-	# to memlock <64M of memory
-	MEMLOCK_AMNT=`ulimit -l`
-
-	if [ "$MEMLOCK_AMNT" != "unlimited" ] ; then
-		MEMLOCK_MB=`expr $MEMLOCK_AMNT / 1024`
-		echo ""
-		echo "Current user memlock limit: ${MEMLOCK_MB} MB"
-		echo ""
-		echo "This is the maximum amount of memory you will be"
-		echo "able to use with DPDK and VFIO if run as current user."
-		echo -n "To change this, please adjust limits.conf memlock "
-		echo "limit for current user."
-
-		if [ $MEMLOCK_AMNT -lt 65536 ] ; then
-			echo ""
-			echo "## WARNING: memlock limit is less than 64MB"
-			echo -n "## DPDK with VFIO may not be able to initialize "
-			echo "if run as current user."
-		fi
-	fi
-}
-
-load_vfio_module
+load_igb_uio_module
 create_mnt_huge
 remove_mnt_huge
 clear_huge_pages
 set_numa_pages
-bind_nics_to_vfio
-set_vfio_permissions
+bind_nics_to_igb_uio
