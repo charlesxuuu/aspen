@@ -10,3 +10,6 @@ cd $DPDK_DIR
 export DPDK_TARGET=x86_64-native-linuxapp-gcc
 export DPDK_BUILD=$DPDK_DIR/$DPDK_TARGET
 make install T=$DPDK_TARGET DESTDIR=install
+
+sudo modprobe uio
+sudo insmod $DPDK_BUILD/kmod/igb_uio.ko
