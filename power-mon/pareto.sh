@@ -33,7 +33,7 @@ probe_bw() {
   freq_range=$(sudo cpufreq-info -c 0 | grep -G "avail.*steps" | grep -o "[0-9]\.[0-9]\{2\}")
   freq_foo="1.60 3.40"
 
-  for freq in $freq_foo; do
+  for freq in $freq_range; do
     set_cpu_freq $pmd_core $freq
 
     for ((i=1;i<=RUN_COUNT;i++)); do
@@ -62,19 +62,10 @@ probe_bw() {
   done
 }
 
-# probe_latency() {
-
-# }
-
 set_cpu_freq() {
   sudo cpufreq-set -c $1 -f $2"GHz"
   echo "-> "CPU $1: $(sudo cpufreq-info -c $1 | grep "current CPU frequency")
 }
-
-# get_power() {
-#   # TODO: implement power
-#   # ./rapl-read-pid
-# }
 
 init() {
   sudo modprobe msr
