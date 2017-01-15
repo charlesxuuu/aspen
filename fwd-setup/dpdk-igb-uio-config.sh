@@ -14,6 +14,7 @@ HUGEPGSZ=`cat /proc/meminfo  | grep Hugepagesize | cut -d : -f 2 | tr -d ' '`
 HUGEPGCOUNT=2048
 
 export RTE_SDK=$SDK_DIR
+export RTE_TARGET=x86_64-native-linuxapp-gcc
 
 load_igb_uio_module()
 {
@@ -44,6 +45,16 @@ load_igb_uio_module()
 		quit
 	fi
 }
+
+remove_igb_uio_module()
+{
+        echo "Unloading any existing DPDK UIO module"
+        /sbin/lsmod | grep -s igb_uio > /dev/null
+        if [ $? -eq 0 ] ; then
+                sudo /sbin/rmmod igb_uio
+        fi
+}
+
 
 set_numa_pages()
 {
@@ -116,6 +127,11 @@ bind_nics_to_igb_uio()
 		echo "# Please load the 'igb_uio' kernel module before querying or "
 		echo "# adjusting NIC device bindings"
 	fi
+}
+
+quit() 
+{
+	QUIT=$1
 }
 
 load_igb_uio_module

@@ -45,6 +45,17 @@ load_vfio_module()
 	fi
 }
 
+remove_vfio_module()
+{
+        echo "Unloading any existing VFIO module"
+        /sbin/lsmod | grep -s vfio > /dev/null
+        if [ $? -eq 0 ] ; then
+                sudo /sbin/rmmod vfio-pci
+                sudo /sbin/rmmod vfio_iommu_type1
+                sudo /sbin/rmmod vfio
+        fi
+}
+
 set_numa_pages()
 {
 	clear_huge_pages

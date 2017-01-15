@@ -3,7 +3,7 @@ CC = gcc
 CFLAGS = -w -O2
 LIBS = -lm
 
-TARGET = rapl-read-quiet
+TARGET = rapl-bw
 
 all: $(TARGET)
 

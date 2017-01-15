@@ -15,6 +15,6 @@ To start:
 
 1. (First time) ovs-db-setup.sh
 2. dpdk-[vfio|uio]-config.sh, ovs-dpdk-init.sh
-3. ovs-dpdk.config.sh
+3. ovs-dpdk-config.sh
 
 Note: You may need to change the locked memory size in the host: /etc/security/limits.conf
